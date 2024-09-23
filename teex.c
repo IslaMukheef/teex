@@ -92,28 +92,46 @@ void editor(const char *filename) {
             case KEY_BACKSPACE: // delete character (this case gave me a lot of Segmentation fault and i hate it)
                 if (col > 0) {
                     memmove(&lines[row][col - 1], &lines[row][col], strlen(&lines[row][col]) + 1);
-                    col--; // Move cursor back after deletion
+                    col = (row == 0 && col == 0) ? 0 : col -1; // Move cursor back after deletion
                 } 
-                else if(col ==0 && strlen(lines[row]) == 0 ){ //TODO fix the error when on first line and delete all chars
-                    if (row == line_count){
+                else if(col ==0 && strlen(lines[row]) == 0 ){ //deletes empty lines
+                    if (row > 0) {
+                        for (int i = row; i < line_count; i++) {
+                            strncpy(lines[i], lines[i+1], MAX_LINE_LENGTH); // moves lines up
+                        }
+                        col = strlen(lines[row - 1]); 
+                        row--;
                         line_count--;
                     }
-                    lines[row][0] = '\0'; // This makes the line col empty
-                    row--;
-                    col = strlen(lines[row]);
                 }
-                
+                else if (col == 0 && row > 0){
+                        strcat(lines[row-1], lines[row]); // merge current line with the one upper
+                        for (int i = row; i < line_count; i++) {
+                            strncpy(lines[i], lines[i+1], MAX_LINE_LENGTH); // moves lines up
+                        }
+                        col = strlen(lines[row - 1]);
+                        row--;
+                        line_count--;
+                    }
                 clear(); // Clear the screen after deleting a character
                 
                 break;
 
-            case '\n': // Handle Enter key (move to next line)
+            case '\n': // Handle Enter key (move to the next line)
                 if (line_count < MAX_LINES - 1) {
-                    memmove(&lines[row + 1], &lines[row], (line_count - row) * MAX_LINE_LENGTH);
-                    lines[row + 1][0] = '\0'; // Create a new, empty line
-                    line_count++; // Increase the total number of lines
-                    row++; // Move cursor to the new line
-                    col = 0; // Reset column position to start of the new line(will be changed when slpit will be added)
+                    // Shift all lines below the current one down by one
+                    for (int i = line_count; i > row; i--) {
+                        strncpy(lines[i + 1], lines[i], MAX_LINE_LENGTH);
+                    }
+
+                    // Move part of the current line after the cursor to the next line
+                    strncpy(lines[row + 1], &lines[row][col], MAX_LINE_LENGTH - col);
+                    lines[row + 1][MAX_LINE_LENGTH - 1] = '\0'; // Null-terminate the new line
+                    lines[row][col] = '\0';
+
+                    line_count++;  
+                    row++;         
+                    col = 0;       
                 }
                 break;
 
