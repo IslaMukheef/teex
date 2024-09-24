@@ -134,7 +134,17 @@ void editor(const char *filename) {
                     col = 0;       
                 }
                 break;
+            case '\t': // tab
+                if (col + 4 < MAX_LINE_LENGTH){
+                    for (int i = 0; i<4; i++){
+                    memmove(&lines[row][col +1], &lines[row][col], strlen(&lines[row][col]) + 1);
+                    lines[row][col]= ' ';
+                    col++;
+                    }
+                }
 
+                break;
+            
             case 27: // Escape key to exit
                 endwin();
                 return;
