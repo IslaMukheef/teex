@@ -8,6 +8,23 @@ int ch;
 int row = 0, col = 0;                   
 char lines[MAX_LINES][MAX_LINE_LENGTH];  
 int line_count = 0;  
+int max_y = 0 ; // will be used to track terminal size 
+
+//  print and scrolling 
+void printlines(){
+    clear();  
+    max_y = getmaxy(stdscr); // update to the current terminal size
+
+    int start_line = (row >=max_y) ? row - max_y +1 : 0; // if row is less start from 0 
+    int end_line = start_line + max_y -1 ;
+  
+    for(int i = start_line; i <= end_line && i <= line_count; i++){
+        mvprintw(i- start_line,0,"%s", lines[i]);
+    }
+    move(row - start_line, col);
+    refresh();
+}
+
 // Function to adjust the cursor's column position if it's beyond the current line's length
 void adjust_cursor_col(char lines[MAX_LINES][MAX_LINE_LENGTH], int *row, int *col) {
     if (*col > (int)strlen(lines[*row])) {
@@ -50,17 +67,8 @@ void editor(const char *filename) {
     refresh(); 
 
     while (1) {
-        clear();
-
        
-        for (int i = 0; i <= line_count; i++) {
-            mvprintw(i, 0, "%s", lines[i]); 
-        }
-
-        
-        move(row, col);
-        refresh();
-
+        printlines();
         ch = getch(); 
         switch (ch) {
             case KEY_LEFT:
