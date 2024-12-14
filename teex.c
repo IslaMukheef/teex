@@ -71,6 +71,11 @@ void editor(const char *filename) {
         printlines();
         ch = getch(); 
         switch (ch) {
+            
+            case KEY_RESIZE: //  handles terminal resize events(random chars on resize)
+                printlines(); // ignore the chars, clear the screen and reprint everthing
+                break;
+            
             case KEY_LEFT:
                 if (col > 0) {
                     col--; // Move left if not at the start of the line
