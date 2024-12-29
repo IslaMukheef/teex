@@ -14,7 +14,7 @@ void save_file(const char *filename){
         printw("Couldnt save the file");
         return;
     }
-    for (int i = 0;i < line_count; i++){
+    for (int i = 0;i <= line_count; i++){
         fprintf(file, "%s\n", lines[i]);
     }
     fclose(file);

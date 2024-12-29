@@ -10,7 +10,9 @@ void editor(const char *filename) {
     raw();                // Disable line buffering
     keypad(stdscr, TRUE); // Enable function keys and arrow keys
     noecho();             // Disable character echoing
-
+    
+    Queue stack;
+    initTracking(&stack);// init everthing to 0
                        
 
     refresh(); 
@@ -50,31 +52,7 @@ void editor(const char *filename) {
                 break;
 
             case KEY_BACKSPACE: // delete character (this case gave me a lot of Segmentation fault and i hate it)
-                if (col > 0) {
-                    memmove(&lines[row][col - 1], &lines[row][col], strlen(&lines[row][col]) + 1);
-                    col = (row == 0 && col == 0) ? 0 : col -1; // Move cursor back after deletion
-                } 
-                else if(col ==0 && strlen(lines[row]) == 0 ){ //deletes empty lines
-                    if (row > 0) {
-                        for (int i = row; i < line_count; i++) {
-                            strncpy(lines[i], lines[i+1], MAX_LINE_LENGTH); // moves lines up
-                        }
-                        col = strlen(lines[row - 1]); 
-                        row--;
-                        line_count--;
-                    }
-                }
-                else if (col == 0 && row > 0){
-                        strcat(lines[row-1], lines[row]); // merge current line with the one upper
-                        for (int i = row; i < line_count; i++) {
-                            strncpy(lines[i], lines[i+1], MAX_LINE_LENGTH); // moves lines up
-                        }
-                        col = strlen(lines[row - 1]);
-                        row--;
-                        line_count--;
-                    }
-                clear(); // Clear the screen after deleting a character
-                
+                delete_char(1);
                 break;
 
             case '\n': // Handle Enter key (move to the next line)
@@ -88,7 +66,7 @@ void editor(const char *filename) {
                     strncpy(lines[row + 1], &lines[row][col], MAX_LINE_LENGTH - col);
                     lines[row + 1][MAX_LINE_LENGTH - 1] = '\0'; // Null-terminate the new line
                     lines[row][col] = '\0';
-
+                    //push(&stack, '\0',row,col);
                     line_count++;  
                     row++;         
                     col = 0;       
@@ -99,8 +77,10 @@ void editor(const char *filename) {
                     for (int i = 0; i<4; i++){
                     memmove(&lines[row][col +1], &lines[row][col], strlen(&lines[row][col]) + 1);
                     lines[row][col]= ' ';
+                    push(&stack, ' ',row,col); // this will fill 4 places instead of just 1. FIX LATER
                     col++;
                     }
+                    
                 }
 
                 break;
@@ -108,6 +88,9 @@ void editor(const char *filename) {
             case 27: // Escape key to exit
                 endwin();
                 return;
+            case 26: // ctrl +z undo function
+                pop(&stack);
+                break;
             case 8: //ctrl+h show the help box new stuff will be added to it later on
                 helpFunc();
                 break;
@@ -118,6 +101,7 @@ void editor(const char *filename) {
                 if (col < MAX_LINE_LENGTH - 1 && row < MAX_LINES) {
                     memmove(&lines[row][col + 1], &lines[row][col], strlen(&lines[row][col]) + 1); // Shift characters to the right
                     lines[row][col] = ch; // Insert the character at the current position
+                    push(&stack, ch,row,col);
                     col++; // Move cursor to the right after insertion
                 }
                 break;
@@ -125,4 +109,3 @@ void editor(const char *filename) {
     }
     endwin();
 }
-
