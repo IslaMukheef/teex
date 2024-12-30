@@ -8,6 +8,7 @@
 - Basic text editing (inserting, deleting, and moving text)
 - Arrow key navigation (up, down, left, right)
 - File saving (`Ctrl+S`)
+- Tracking recent actions and undo them with (`Ctrl+Z`) 
 - Open and edit existing files by providing the file name as a command-line argument
 - Quit using the `Esc` key
 
@@ -18,6 +19,7 @@
 - **Enter**: Create new line and splits the current line.
 - **Esc**: Exit the editor.
 - **Ctrl+S**: Save the current file.
+- **Ctrl+Z**: Un do recent action.
 - **Ctrl+H**: Show help window
 
 ## How to Use
