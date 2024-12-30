@@ -31,7 +31,7 @@ void adjust_cursor_col(char lines[MAX_LINES][MAX_LINE_LENGTH], int *row, int *co
 void initTracking(CircularQueue *stack);// init the tracking of the undo fucntion
 void push(CircularQueue *stack,char new_char, int new_x, int new_y); // track last changes(Queue_SIZE)
 void pop(CircularQueue *stack, CircularQueue *reSack); // undo using the ctrl +z 
-void redo(CircularQueue *reStack, CircularQueue *stack);
+void redo(CircularQueue *reStack, CircularQueue *stack);// redo using ctrl + y
 void delete_char(int caller_type); // handle deleting chars in the editor
 
 void save_file(const char *filename); 
