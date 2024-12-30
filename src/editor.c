@@ -11,10 +11,14 @@ void editor(const char *filename) {
     keypad(stdscr, TRUE); // Enable function keys and arrow keys
     noecho();             // Disable character echoing
     
-    Queue stack;
-    initTracking(&stack);// init everthing to 0
-                       
-
+    CircularQueue stack;
+    CircularQueue reStack ;
+    if(enable_undo_redo) // we check if we can use undo redo here if it false we set it as is
+    {
+        initTracking(&stack);//undo
+        initTracking(&reStack);//redo 
+    }
+    
     refresh(); 
 
     while (1) {
@@ -77,7 +81,7 @@ void editor(const char *filename) {
                     for (int i = 0; i<4; i++){
                     memmove(&lines[row][col +1], &lines[row][col], strlen(&lines[row][col]) + 1);
                     lines[row][col]= ' ';
-                    push(&stack, ' ',row,col); // this will fill 4 places instead of just 1. FIX LATER
+                    if(enable_undo_redo) push(&stack, ' ',row,col); // this will fill 4 places instead of just 1. FIX LATER
                     col++;
                     }
                     
@@ -89,7 +93,10 @@ void editor(const char *filename) {
                 endwin();
                 return;
             case 26: // ctrl +z undo function
-                pop(&stack);
+                if(enable_undo_redo) pop(&stack, &reStack);
+                break;
+            case 25: // ctrl +y redo function
+                redo(&reStack, &stack);
                 break;
             case 8: //ctrl+h show the help box new stuff will be added to it later on
                 helpFunc();
@@ -101,7 +108,7 @@ void editor(const char *filename) {
                 if (col < MAX_LINE_LENGTH - 1 && row < MAX_LINES) {
                     memmove(&lines[row][col + 1], &lines[row][col], strlen(&lines[row][col]) + 1); // Shift characters to the right
                     lines[row][col] = ch; // Insert the character at the current position
-                    push(&stack, ch,row,col);
+                    if(enable_undo_redo) push(&stack, ch,row,col);
                     col++; // Move cursor to the right after insertion
                 }
                 break;

@@ -9,6 +9,7 @@
 - Arrow key navigation (up, down, left, right)
 - File saving (`Ctrl+S`)
 - Tracking recent actions and undo them with (`Ctrl+Z`) 
+- Tracking of recent deleted chars with ctrl + z to restore it with(`Ctrl+Y`)",
 - Open and edit existing files by providing the file name as a command-line argument
 - Quit using the `Esc` key
 
@@ -19,7 +20,8 @@
 - **Enter**: Create new line and splits the current line.
 - **Esc**: Exit the editor.
 - **Ctrl+S**: Save the current file.
-- **Ctrl+Z**: Un do recent action.
+- **Ctrl+Z**: Undo recent action.
+- **Ctrl+Y**: Restore recent deleted chars.
 - **Ctrl+H**: Show help window
 
 ## How to Use

@@ -6,16 +6,16 @@
 
 
 /* 
-called when app first run!
+called when app first run if the enable_undo_redo was True which is the defult!
 */
-void initTracking(Queue *stack){
+void initTracking(CircularQueue *stack){
     stack->front = 0;
     stack->rear = 0;
     stack->current_size = 0;
 }
 // each new added char will be pushed to the sack
 //the stack has it limit(Queue_SIZE)
-void push(Queue *stack,char new_char, int new_x, int new_y){
+void push(CircularQueue *stack,char new_char, int new_x, int new_y){
     if(stack->current_size == Queue_SIZE){
         stack->front = (stack->front +1) % Queue_SIZE; // move it by one when the last elemetn is reached
     }
@@ -30,26 +30,55 @@ void push(Queue *stack,char new_char, int new_x, int new_y){
 }
 
 // ctrl+z function where char will be poped from the stack and will be deleted from screen as well
-void pop(Queue *stack){
+void pop(CircularQueue *stack, CircularQueue *reStack){
     if(stack->current_size ==0){
         return;
     }
+    
     // stack->rear, but after the push() operation, rear always points to the next empty slot (not the last pushed item).
     int index = (stack->rear - 1 + Queue_SIZE) % Queue_SIZE;
+    //push the char that will be deleted to our redo(reStack) 
+    push(reStack,stack->node_char[index], stack->x_row[index], stack->y_col[index]);
+    //
     int temp_x = row;
     row = stack->x_row[index];
     int temp_y = col;
     col = stack->y_col[index]; 
-    //assuming that the current col and row points to the char that will be poped
-    delete_char(2);
-       
+    delete_char(2);    
     row = temp_x;
     col = temp_y;
-    //mvprintw(stack->x_row[stack->rear],stack->y_col[stack->rear],"%c", stack->node_char[stack->rear]);
+    adjust_cursor_col(lines, &row, &col); // make sure the cursor stays at the last char not beyond it
     stack->rear = index ;     
     stack->current_size--;
     
-} // end of the undo structure !
+}
+/*
+Redo will work as the opiste of pop which it will pop the last char from Restack and push it to
+stack again and reprint it to the screen.
+Difference is: redo needs to add the char back to lines and print it back
+we do not change  line_count here! 
+POP do not delete empty lines or remerge the old ones for now
+it only delete chars.
+redo only reprint them
+*/
+void redo(CircularQueue *reStack, CircularQueue *stack){
+    if(reStack->current_size == 0){
+        return;
+    }
+    int index = (reStack->rear - 1 + Queue_SIZE) % Queue_SIZE; // get the index of last char
+    char redo_char = reStack->node_char[index];
+    int redo_row = reStack->x_row[index];
+    int redo_col = reStack->y_col[index];
+    push(stack, redo_char, redo_row, redo_col);// push the the char that we did rewrite to the stack so we can undo it later if want
+    memmove(&lines[redo_row][redo_col + 1], &lines[redo_row][redo_col], strlen(&lines[redo_row][redo_col]) + 1); 
+    lines[redo_row][redo_col] = redo_char; // adding the char back to lines
+    row = redo_row;
+    col = redo_col + 1;
+    reStack->rear = index ;     
+    reStack->current_size--;
+    printlines(); // reprint the char
+}
+ // end of the undo structure !
 
 /*
 delete_char handles all the removing of chars in the editor even spaces and taps
@@ -149,6 +178,7 @@ void helpFunc() {
         "Ctrl + s: save the file",
         "Ctrl + h: shows this help screen",
         "Ctrl + z: Reverse last action",
+        "Ctrl + y: restore what you deleted with ctrl+z",
         "Esc: exit Teex editor"
     };
     int msg_len = sizeof(msg) / sizeof(msg[0]);
