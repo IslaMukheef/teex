@@ -154,7 +154,6 @@ void destroy_win(WINDOW * local_win){
     delwin(local_win);
 }
 
-
 //Print help window
 void helpFunc() {
     int startx, starty;
@@ -178,7 +177,7 @@ void helpFunc() {
         "Ctrl + s: save the file",
         "Ctrl + h: shows this help screen",
         "Ctrl + z: Reverse last action",
-        "Ctrl + y: restore what you deleted with ctrl+z",
+        "Ctrl + y: restore what was deleted with ctrl+z",
         "Esc: exit Teex editor"
     };
     int msg_len = sizeof(msg) / sizeof(msg[0]);
@@ -189,7 +188,6 @@ void helpFunc() {
     wch = getch(); // this line is used to just keep the window on but will be replaced later
     destroy_win(my_wind);
 }
-
 
 // printlines 
 void printlines(){

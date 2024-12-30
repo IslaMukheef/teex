@@ -8,7 +8,6 @@ int row = 0, col = 0;
 char lines[MAX_LINES][MAX_LINE_LENGTH];
 int line_count = 0;
 bool enable_undo_redo = true; // tracking will be working now 
- //int Queue_SIZE = 50;
 
 int main(int argc, char *argv[]) {
     char filename[256];

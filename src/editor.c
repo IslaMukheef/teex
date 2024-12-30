@@ -11,6 +11,7 @@ void editor(const char *filename) {
     keypad(stdscr, TRUE); // Enable function keys and arrow keys
     noecho();             // Disable character echoing
     
+    
     CircularQueue stack;
     CircularQueue reStack ;
     if(enable_undo_redo) // we check if we can use undo redo here if it false we set it as is
