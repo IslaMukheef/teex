@@ -5,6 +5,7 @@
 ## Features
 
 - Show help(`Ctrl+H`)
+- File explorer(`Ctrl+F`)
 - Basic text editing (inserting, deleting, and moving text)
 - Arrow key navigation (up, down, left, right)
 - File saving (`Ctrl+S`)
@@ -23,6 +24,7 @@
 - **Ctrl+Z**: Undo recent action.
 - **Ctrl+Y**: Restore recently deleted chars.
 - **Ctrl+H**: Show help window.
+- **Ctrl+F**: Show file explorer window for current dir.
 
 ## How to Use
 

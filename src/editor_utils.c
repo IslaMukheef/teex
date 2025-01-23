@@ -2,8 +2,8 @@
 #include <ncurses.h>
 #include <string.h>
 #include <stdio.h>  
-
-
+#include <dirent.h>
+#include <stdlib.h>
 
 /* 
 called when app first run if the enable_undo_redo was True which is the defult!
@@ -203,6 +203,123 @@ void printlines(){
     move(row - start_line, col);
     refresh();
 
+}
+// this function will be called to highlight when a user uses arrows to chose which file to open!
+void file_explorer_hightlight(WINDOW *local_win, int num, char *fileslist[]) {
+    int file_wch; // 
+    curs_set(0); // set curs to hide so we dont keep updating it for the window
+    int current_iteam = 0; // track which file is being selected at the moment
+    
+    // Initial highlighting
+    wattron(local_win, A_REVERSE);
+    mvwprintw(local_win, current_iteam + 1, 1, "%s", fileslist[current_iteam]);
+    wattroff(local_win, A_REVERSE);
+
+    for (int i = 1; i < num; i++) {
+        mvwprintw(local_win, i + 1, 1, "%s", fileslist[i]);
+    }
+
+    wrefresh(local_win);
+    while(1){
+        wrefresh(local_win);
+        file_wch = getch();
+        switch (file_wch)
+        {
+            case KEY_UP:
+                if(current_iteam > 0)
+                {
+                    // remove the already highlighted line 
+                    mvwprintw(local_win, current_iteam + 1, 1, "%s", fileslist[current_iteam]); // just reprint it with no hightlight
+
+                    // now apply the new highlight
+                    current_iteam--;
+                    wattron(local_win, A_REVERSE);
+                    mvwprintw(local_win, current_iteam + 1, 1, "%s", fileslist[current_iteam]);
+                    wattroff(local_win, A_REVERSE);
+                    wrefresh(local_win);
+                }
+                break;
+            case KEY_DOWN:
+                if(current_iteam <num-1) // with this we can reach all iteams until current_iteam is == to num(last element)
+                {
+                    // remove the already highlighted line 
+                    mvwprintw(local_win, current_iteam + 1, 1, "%s", fileslist[current_iteam]); // just reprint it with no hightlight
+
+                    // now apply the new highlight
+                    current_iteam++;
+                    wattron(local_win, A_REVERSE);
+                    mvwprintw(local_win, current_iteam + 1, 1, "%s", fileslist[current_iteam]);
+                    wattroff(local_win, A_REVERSE);
+                    wrefresh(local_win);
+                }
+                break;
+            case 27: // esc is pressed to exit the file explorer
+                break;    
+
+            /*
+            the way the file explorer work is
+            it gets the current file and save it to file_to_load then set the flag to 1 saying that we gonna load a new file.
+            the main.c knows that if the flag is 1 then it will loads the new file and dump the old one.
+            the status of the current file will be lost if not saved.
+            this will be fixed later on.
+            this is still new so it can be buggy!
+            */
+            case '\n':
+                strcpy(file_to_load, fileslist[current_iteam]); //move the file name to new var
+                load_new_file =1; // set the flag to 1 to alert the editor to load the new file and dump the old one 
+                break;
+
+        }
+        if (file_wch == 27|| file_wch =='\n'){
+            break; // exit the loop on esc press
+        }
+    }
+    
+    destroy_win(local_win);
+    curs_set(1); // restore the curs
+   
+    
+
+}
+
+//some this function stuff need to be moved to file_utils.c as we are dealing with files but for now it stays here!
+void file_explorer() //
+{
+    int number_of_files = 0;
+    char *fileslist[30]; // change this number later on
+    // using the same stuff for help function here. These are repated code they need to be used only once so i will get rid of it later.
+    int startx, starty;
+    int height=LINES; // height will take all window
+    int width =COLS/ 5;  // get width to be 5th of the rows THIS NEED TO BE CHANGED LATER TO SOMETHING BETTER 
+    
+    WINDOW *my_wind;    // struct to window
+
+    starty = 0;
+    startx = (COLS - width) ;   
+
+    my_wind = create_window(height, width, starty, startx);
+    struct dirent *dir_entry; // pointer to directory entery
+    DIR *dr = opendir("."); // open current directory
+
+    if(dr == NULL){
+        
+        printw("there was nothing"); 
+        return;
+    }
+    
+    // if the dir is not null then add files to filelist
+    while((dir_entry=readdir(dr)) != NULL){
+        fileslist[number_of_files] = strdup(dir_entry->d_name);
+        number_of_files++;
+        if(number_of_files >= 30) break; 
+    }
+    file_explorer_hightlight(my_wind, number_of_files, fileslist);
+    
+    // freeing the filelist 
+    for(int i = 0; i<number_of_files; i++){
+        free(fileslist[i]);
+    }
+    closedir(dr);
 }
 
 // Function to adjust the cursor's column position if it's beyond the current line's length

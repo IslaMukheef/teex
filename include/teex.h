@@ -12,6 +12,8 @@ extern int row, col;
 extern char lines[MAX_LINES][MAX_LINE_LENGTH]; // all the lines lays here!
 extern int line_count;
 extern bool enable_undo_redo; // make sure that is on if you want to track
+extern int load_new_file;  // flag set to alert the editor to kill everthing and move on with the new file from explore
+extern char file_to_load[256];
 
 typedef struct {
     char node_char[Queue_SIZE];
@@ -33,6 +35,8 @@ void push(CircularQueue *stack,char new_char, int new_x, int new_y); // track la
 void pop(CircularQueue *stack, CircularQueue *reSack); // undo using the ctrl +z 
 void redo(CircularQueue *reStack, CircularQueue *stack);// redo using ctrl + y
 void delete_char(int caller_type); // handle deleting chars in the editor
+void file_explorer(); // create window with the files of current dir
+void file_explorer_hightlight(WINDOW *local_win, int num, char *fileslist[]);
 
 void save_file(const char *filename); 
 void read_file(const char *filename);

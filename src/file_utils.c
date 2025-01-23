@@ -1,6 +1,7 @@
 #include "../include/teex.h"
 #include <stdio.h>
 #include <string.h>
+#include <dirent.h>
 
 
 

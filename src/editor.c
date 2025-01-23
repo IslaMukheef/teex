@@ -105,6 +105,13 @@ void editor(const char *filename) {
             case 19:
                 save_file(filename);
                 break;
+            case 6: // ctrl + f open file explorer 
+                file_explorer();
+                if (load_new_file ==1){
+                    endwin();
+                    return;
+                }
+                break;
             default: // Handle regular character input
                 if (col < MAX_LINE_LENGTH - 1 && row < MAX_LINES) {
                     memmove(&lines[row][col + 1], &lines[row][col], strlen(&lines[row][col]) + 1); // Shift characters to the right
