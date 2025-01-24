@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
         strcpy(filename, "isla.txt");
     } else {
         strcpy(filename, argv[1]);
+        read_file(filename);
     }
 
     // Main application loop
