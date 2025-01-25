@@ -178,6 +178,7 @@ void helpFunc() {
         "Ctrl + h: shows this help screen",
         "Ctrl + z: Reverse last action",
         "Ctrl + y: restore what was deleted with ctrl+z",
+        "Ctrl + f: File explorer",
         "Esc: exit Teex editor"
     };
     int msg_len = sizeof(msg) / sizeof(msg[0]);
